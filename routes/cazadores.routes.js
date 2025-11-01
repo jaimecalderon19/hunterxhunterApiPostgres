@@ -171,22 +171,51 @@ router.post("/cazadores", async (req, res) => {
  */
 router.put("/cazadores/:id", async (req, res) => {
   const { id } = req.params;
+  const {
+    nombre,
+    edad,
+    altura,
+    peso,
+    imagen,
+    genero,
+    habilidades,
+    tipoLicencia
+  } = req.body;
+
+  // Crear objeto solo con los campos que se enviaron
+  const updateValues = {};
+  if (nombre !== undefined) updateValues.nombre = nombre;
+  if (edad !== undefined) updateValues.edad = edad;
+  if (altura !== undefined) updateValues.altura = altura;
+  if (peso !== undefined) updateValues.peso = peso;
+  if (imagen !== undefined) updateValues.imagen = imagen;
+  if (genero !== undefined) updateValues.genero = genero;
+  if (habilidades !== undefined) updateValues.habilidades = habilidades;
+  if (tipoLicencia !== undefined) updateValues.tipoLicencia = tipoLicencia;
+
+  // Verificar que se envió al menos un campo para actualizar
+  if (Object.keys(updateValues).length === 0) {
+    return res.status(400).json({ error: "No se proporcionaron campos para actualizar" });
+  }
+
   try {
-    const [actualizado] = await db
+    const [updated] = await db
       .update(cazadores)
-      .set(req.body)
+      .set(updateValues)
       .where(eq(cazadores.id, Number(id)))
-      .returning("*");
+      .returning();
 
-    if (!actualizado)
+    if (!updated) {
       return res.status(404).json({ error: "Cazador no encontrado" });
+    }
 
-    res.json({ message: "Cazador actualizado correctamente", cazador: actualizado });
+    res.json({ message: "Cazador actualizado correctamente", cazador: updated });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error al actualizar el cazador" });
+    console.error("❌ Error al actualizar cazador:", err);
+    res.status(500).json({ error: "Error al actualizar el cazador", details: err.message });
   }
 });
+
 
 /**
  * @swagger
@@ -207,20 +236,22 @@ router.put("/cazadores/:id", async (req, res) => {
  */
 router.delete("/cazadores/:id", async (req, res) => {
   const { id } = req.params;
+
   try {
     const deleted = await db
       .delete(cazadores)
       .where(eq(cazadores.id, Number(id)))
-      .returning("*");
+      .returning({ id: cazadores.id }); // ✅ evita el bug
 
     if (deleted.length === 0)
       return res.status(404).json({ error: "Cazador no encontrado" });
 
     res.json({ message: "Cazador eliminado correctamente" });
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error al eliminar cazador:", err);
     res.status(500).json({ error: "Error al eliminar el cazador" });
   }
 });
+
 
 export default router;
