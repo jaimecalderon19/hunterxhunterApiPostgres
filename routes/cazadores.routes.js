@@ -107,8 +107,34 @@ router.get("/cazadores/buscar", async (req, res) => {
  *         description: Cazador creado exitosamente
  */
 router.post("/cazadores", async (req, res) => {
+  const {
+    nombre,
+    edad,
+    altura,
+    peso,
+    imagen,
+    genero,
+    habilidades,
+    tipoLicencia
+  } = req.body;
+
+  const newCazadorValues = {
+    nombre,
+    edad,
+    altura,
+    peso,
+    imagen,
+    genero,
+    habilidades,
+    tipoLicencia
+  };
+
   try {
-    const [nuevo] = await db.insert(cazadores).values(req.body).returning("*");
+    const [nuevo] = await db
+      .insert(cazadores)
+      .values(newCazadorValues)
+      .returning();
+
     res
       .status(201)
       .json({ message: "Cazador creado exitosamente", cazador: nuevo });
