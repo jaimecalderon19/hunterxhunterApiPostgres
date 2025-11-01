@@ -59,10 +59,10 @@ router.get("/cazadores/buscar", async (req, res) => {
     const resultado = await db
       .select()
       .from(cazadores)
-      .where(eq(cazadores.nombre, nombre));
+      .where(ilike(cazadores.nombre, `%${nombre}%`));
 
     if (resultado.length > 0) {
-      res.json({ found: true, cazador: resultado[0] });
+      res.json({ found: true, cazadores: resultado });
     } else {
       res.json({ found: false, message: "Cazador no encontrado" });
     }
