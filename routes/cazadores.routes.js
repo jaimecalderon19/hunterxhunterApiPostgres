@@ -1,7 +1,7 @@
 import express from "express";
 import { db } from "../config/db.js";
 import { cazadores } from "../schema/cazadorSchema.js";
-import { eq } from "drizzle-orm";
+import { eq, like } from "drizzle-orm";
 
 const router = express.Router();
 
@@ -59,7 +59,7 @@ router.get("/cazadores/buscar", async (req, res) => {
     const resultado = await db
       .select()
       .from(cazadores)
-      .where(ilike(cazadores.nombre, `%${nombre}%`));
+      .where(like(cazadores.nombre, `%${nombre}%`));
 
     if (resultado.length > 0) {
       res.json({ found: true, cazadores: resultado });
