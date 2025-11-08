@@ -34,5 +34,5 @@ app.use("/api", cazadoresRoutes);
 
 // 🚀 Servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo en ${process.env.HOST}:${PORT}`);
 });
